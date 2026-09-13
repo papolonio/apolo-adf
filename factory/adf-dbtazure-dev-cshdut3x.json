@@ -1,0 +1,15 @@
+{
+	"name": "adf-dbtazure-dev-cshdut3x",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "brazilsouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "35636b04-f5bd-44b9-ad0a-025507184416",
+		"tenantId": "fdf338bc-2c48-4c04-88fd-539da1fec225"
+	}
+}
