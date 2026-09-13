@@ -1,0 +1,20 @@
+{
+  "name": "ls_function_bridge",
+  "properties": {
+    "annotations": [],
+    "type": "AzureFunction",
+    "typeProperties": {
+      "authentication": "Anonymous",
+      "functionAppUrl": "https://func-dbtazure-dev-cshdut3x.azurewebsites.net",
+      "functionKey": {
+        "secretName": "BridgeFunctionKey",
+        "secretVersion": "de9ce3f7058b4f3a86800b9af0f5bfbb",
+        "store": {
+          "referenceName": "ls_keyvault_apolo",
+          "type": "LinkedServiceReference"
+        },
+        "type": "AzureKeyVaultSecret"
+      }
+    }
+  }
+}

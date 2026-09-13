@@ -1,74 +1,113 @@
 {
-	"name": "pl_copy_source_to_landing",
-	"properties": {
-		"activities": [
-			{
-				"name": "ForEach1",
-				"type": "ForEach",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@json('[{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_clientes.csv\"},{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_produtos.csv\"},{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_pedidos.csv\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_clientes.parquet\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_produtos.parquet\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_pedidos.parquet\"}]')\n",
-						"type": "Expression"
-					},
-					"activities": [
-						{
-							"name": "Copy data1",
-							"type": "Copy",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "BinarySource",
-									"storeSettings": {
-										"type": "AzureBlobFSReadSettings",
-										"recursive": true
-									},
-									"formatSettings": {
-										"type": "BinaryReadSettings"
-									}
-								},
-								"sink": {
-									"type": "BinarySink",
-									"storeSettings": {
-										"type": "AzureBlobFSWriteSettings"
-									}
-								},
-								"enableStaging": false
-							},
-							"inputs": [
-								{
-									"referenceName": "ds_source",
-									"type": "DatasetReference",
-									"parameters": {
-										"folderPath": "@item().folderPath",
-										"fileName": "@item().fileName"
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "ds_landing",
-									"type": "DatasetReference",
-									"parameters": {
-										"folderPath": "@item().folderPath",
-										"fileName": "@item().fileName"
-									}
-								}
-							]
-						}
-					]
-				}
-			}
-		],
-		"annotations": []
-	}
+  "name": "pl_copy_source_to_landing",
+  "properties": {
+    "activities": [
+      {
+        "dependsOn": [],
+        "name": "ForEach1",
+        "type": "ForEach",
+        "typeProperties": {
+          "activities": [
+            {
+              "dependsOn": [],
+              "inputs": [
+                {
+                  "parameters": {
+                    "fileName": "@item().fileName",
+                    "folderPath": "@item().folderPath"
+                  },
+                  "referenceName": "ds_source",
+                  "type": "DatasetReference"
+                }
+              ],
+              "name": "Copy data1",
+              "outputs": [
+                {
+                  "parameters": {
+                    "fileName": "@item().fileName",
+                    "folderPath": "@item().folderPath"
+                  },
+                  "referenceName": "ds_landing",
+                  "type": "DatasetReference"
+                }
+              ],
+              "policy": {
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false,
+                "timeout": "0.12:00:00"
+              },
+              "type": "Copy",
+              "typeProperties": {
+                "enableStaging": false,
+                "sink": {
+                  "storeSettings": {
+                    "type": "AzureBlobFSWriteSettings"
+                  },
+                  "type": "BinarySink"
+                },
+                "source": {
+                  "formatSettings": {
+                    "type": "BinaryReadSettings"
+                  },
+                  "storeSettings": {
+                    "recursive": true,
+                    "type": "AzureBlobFSReadSettings"
+                  },
+                  "type": "BinarySource"
+                }
+              },
+              "userProperties": []
+            },
+            {
+              "dependsOn": [
+                {
+                  "activity": "Copy data1",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ],
+              "linkedServiceName": {
+                "referenceName": "ls_function_bridge",
+                "type": "LinkedServiceReference"
+              },
+              "name": "Bridge to Databricks",
+              "policy": {
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false,
+                "timeout": "0.12:00:00"
+              },
+              "type": "AzureFunctionActivity",
+              "typeProperties": {
+                "body": {
+                  "fileName": "@{item().fileName}",
+                  "folderPath": "@{item().folderPath}"
+                },
+                "functionName": "bridge",
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "method": "POST"
+              },
+              "userProperties": []
+            }
+          ],
+          "items": {
+            "type": "Expression",
+            "value": "@json('[{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_clientes.csv\"},{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_produtos.csv\"},{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_pedidos.csv\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_clientes.parquet\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_produtos.parquet\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_pedidos.parquet\"}]')\n"
+          }
+        },
+        "userProperties": []
+      }
+    ],
+    "annotations": [],
+    "lastPublishTime": "2026-09-13T17:46:40Z",
+    "policy": {
+      "elapsedTimeMetric": {}
+    }
+  }
 }
