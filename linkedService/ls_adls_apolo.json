@@ -1,0 +1,10 @@
+{
+	"name": "ls_adls_apolo",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://dbtazuredevcshdut3x2ydxc.dfs.core.windows.net/"
+		}
+	}
+}
