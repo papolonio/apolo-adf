@@ -1,0 +1,74 @@
+{
+	"name": "pl_copy_source_to_landing",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@json('[{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_clientes.csv\"},{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_produtos.csv\"},{\"folderPath\":\"csv\",\"fileName\":\"erp_ficticio_pedidos.csv\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_clientes.parquet\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_produtos.parquet\"},{\"folderPath\":\"parquet\",\"fileName\":\"erp_ficticio_pedidos.parquet\"}]')\n",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_source",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": "@item().folderPath",
+										"fileName": "@item().fileName"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_landing",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": "@item().folderPath",
+										"fileName": "@item().fileName"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}
