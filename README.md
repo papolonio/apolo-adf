@@ -14,7 +14,19 @@ Fluxo esperado, uma vez conectado:
 
 ## Estado atual
 
-Ainda não conectado — o ADF só será provisionado na Fase 2 do roadmap (ver `IMPLEMENTATION_PLAN.md` no repo `apolo-infra`). Este repo existe desde já só pra reservar o nome/local que a Git integration vai usar.
+Conectado e em uso. Recursos criados via UI do ADF Studio e sincronizados aqui:
+
+- `linkedService/ls_adls_apolo.json` — conexão com o ADLS Gen2 via Managed Identity (sem credencial explícita)
+- `dataset/ds_source.json` / `dataset/ds_landing.json` — datasets Binary parametrizados (`folderPath`, `fileName`), apontando para os containers `source` e `landing`
+- `pipeline/pl_copy_source_to_landing.json` — pipeline com um `ForEach` iterando uma lista fixa de 6 arquivos fictícios (3 tabelas × CSV/Parquet), copiando cada um de `source/` para `landing/` via `Copy data`
+
+### Nota: bug conhecido no botão "Publish" do ADF Studio
+
+Na primeira publicação depois de conectar a Git integration, o botão **Publish** falhou com o erro `Cannot read properties of undefined (reading '__LAST_PUBLISHED_COMMIT_ID___')` — um bug de estado local do navegador (a definição já estava salva corretamente na branch `main` via Git integration; só a aplicação na factory ao vivo, que o Publish normalmente faz, não aconteceu). Refresh e aba anônima não resolveram.
+
+**Workaround aplicado:** os arquivos JSON já commitados em `main` (`linkedService/`, `dataset/`, `pipeline/`) foram aplicados diretamente na factory via API REST do ARM (`PUT .../linkedservices/{name}`, `.../datasets/{name}`, `.../pipelines/{name}`, api-version `2018-06-01`), o que tem o mesmo efeito prático de "Publish" para uso imediato (a factory passa a ter os recursos ao vivo e disparáveis). A branch `adf_publish` (usada pra promover essa definição pra outro ambiente via CI/CD) ainda não foi gerada — só importa quando isso for necessário, o que não é o caso enquanto só existe uma factory de dev.
+
+Validado com uma execução real (não Debug) do pipeline via API (`createRun`), resultado `Succeeded`, confirmando os 6 arquivos copiados de `source/` para `landing/`.
 
 ## Repositórios do projeto
 
